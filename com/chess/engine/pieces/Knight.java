@@ -7,7 +7,6 @@ import com.chess.engine.board.Move;
 import com.chess.engine.board.Move.AttackMove;
 import com.chess.engine.board.Move.MajorMove;
 import com.chess.engine.board.Tile;
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,10 +48,15 @@ public class Knight extends Piece {
         //return ImmutableList.copyOf(legalMoves);
         return Collections.unmodifiableList(legalMoves);
     }
+    
+    @Override
+    public String toString() {
+        return PieceType.KNIGHT.toString();
+    }
 
     private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
         return BoardUtils.FIRST_COLUMN[currentPosition]
-                && ((candidateOffset == -17) || (candidateOffset == -10) || (candidateOffset == 6) || (candidateOffset == 15));
+                && (candidateOffset == -1 || candidateOffset == -10 || candidateOffset == 6 || candidateOffset == 15);
     }
 
     private static boolean isSecondColumnExclusion(final int currentPosition, final int candidateOffset) {
