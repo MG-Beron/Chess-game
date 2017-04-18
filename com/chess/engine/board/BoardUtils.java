@@ -1,11 +1,17 @@
 package com.chess.engine.board;
 
+import java.util.Map;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class BoardUtils {
 
     public static boolean[] FIRST_COLUMN = initColumn(0);
     public static boolean[] SECOND_COLUMN = initColumn(1);
     public static boolean[] SEVENTH_COLUMN = initColumn(6);
     public static boolean[] EIGHT_COLUMN = initColumn(7);
+
+    public static final String[] ALGEBREIC_NOTATION = initializeAlgebreicNotation();
+    public static final Map<String, Integer> POSITION_TO_COORDINATE = initializePositionToCoordinateMap();
 
     public static final boolean[] EIGHT_RANK = initRow(0);
     public static final boolean[] SEVENTH_RANK = initRow(8);
@@ -21,6 +27,15 @@ public class BoardUtils {
 
     public static boolean isValidTileCoordinate(final int coordinate) {
         return coordinate >= 0 && coordinate < NUM_TILES;
+    }
+
+    public static int getCoordinateAtPosition(final String position) {
+        return POSITION_TO_COORDINATE.get(position);
+    }
+
+    public static int getPositionAtCoordinate(final int coordinate) {
+        //return ALGEBREIC_NOTATION[coordinate];
+        throw new NotImplementedException();
     }
 
     private static boolean[] initColumn(int columnNumber) {
@@ -41,5 +56,13 @@ public class BoardUtils {
         } while (rowNumber % NUM_TILES_PER_ROW != 0);
 
         return row;
+    }
+
+    private static String[] initializeAlgebreicNotation() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static Map<String, Integer> initializePositionToCoordinateMap() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
