@@ -19,6 +19,10 @@ public abstract class Tile {
 
     public abstract Piece getPiece();
 
+    public int getTileCoordinate() {
+        return this.tileCoordinate;
+    }
+    
     public static Tile createTile(final int tileCoordinate, final Piece piece) {
         return piece != null ? new OccupiedTile(tileCoordinate, piece) : EMPTY_TILES_CACHE.get(tileCoordinate);
     }

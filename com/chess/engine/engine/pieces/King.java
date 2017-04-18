@@ -12,26 +12,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class Knight extends Piece {
+public class King extends Piece {
 
-    private final static int[] CANDIDATE_MOVE_COORDINATES = {-17, -15, -10, -6, 6, 10, 15, 17};
+    private final static int[] CANDIDATE_MOVE_COORDINATE = {-9, -8, -7, -1, 1, 7, 8, 9};
 
-    public Knight(final int piecePosition, final Alliance pieceAlliance) {
-        super(piecePosition, pieceAlliance);
+    public King(final int piecePosition, final Alliance pieceAlliance) {
+        super(PieceType.KING, piecePosition, pieceAlliance);
     }
 
     @Override
     public Collection<Move> calculateLegalMoves(Board board) {
         final List<Move> legalMoves = new ArrayList<Move>();
-        for (final int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
+        for (int currentCandidateOffset : CANDIDATE_MOVE_COORDINATE) {
             final int candidateDestinationCoordinate = this.piecePosition + currentCandidateOffset;
+            if (isFirstColumnExclusion(this.piecePosition, currentCandidateOffset)
+                    || isEightColumnExclusion(piecePosition, currentCandidateOffset)) {
+                continue;
+            }
+            
             if (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
-                if (isFirstColumnExclusion(this.piecePosition, currentCandidateOffset)
-                        || isSecondColumnExclusion(piecePosition, currentCandidateOffset)
-                        || isSeventhColumnExclusion(piecePosition, currentCandidateOffset)
-                        || isEightColumnExclusion(piecePosition, currentCandidateOffset)) {
-                    continue;
-                }
                 final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
                 if (!candidateDestinationTile.isTileOccupied()) {
                     legalMoves.add(new MajorMove(board, this, candidateDestinationCoordinate));
@@ -45,33 +44,26 @@ public class Knight extends Piece {
             }
         }
 
-        //return ImmutableList.copyOf(legalMoves);
         return Collections.unmodifiableList(legalMoves);
     }
     
     @Override
+    public Piece movePiece(final Move move) {
+        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+    }
+    
+    @Override
     public String toString() {
-        return PieceType.KNIGHT.toString();
+        return PieceType.KING.toString();
     }
 
     private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
         return BoardUtils.FIRST_COLUMN[currentPosition]
-                && (candidateOffset == -1 || candidateOffset == -10 || candidateOffset == 6 || candidateOffset == 15);
-    }
-
-    private static boolean isSecondColumnExclusion(final int currentPosition, final int candidateOffset) {
-        return BoardUtils.SECOND_COLUMN[currentPosition]
-                && (candidateOffset == -10 || candidateOffset == 6);
-    }
-
-    private static boolean isSeventhColumnExclusion(final int currentPosition, final int candidateOffset) {
-        return BoardUtils.SEVENTH_COLUMN[currentPosition]
-                && (candidateOffset == -6 || candidateOffset == 10);
+                && (candidateOffset == -9 || candidateOffset == -1 || candidateOffset == 7);
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int candidateOffset) {
         return BoardUtils.EIGHT_COLUMN[currentPosition]
-                && (candidateOffset == -15 || candidateOffset == -6 || candidateOffset == 10 || candidateOffset == 17);
+                && (candidateOffset == -7 || candidateOffset == 1 || candidateOffset == 9);
     }
-
 }
