@@ -1,16 +1,20 @@
 package com.chess.engine.board;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class BoardUtils {
+public enum BoardUtils {
+    INSTANCE;
 
     public static boolean[] FIRST_COLUMN = initColumn(0);
     public static boolean[] SECOND_COLUMN = initColumn(1);
     public static boolean[] SEVENTH_COLUMN = initColumn(6);
     public static boolean[] EIGHT_COLUMN = initColumn(7);
 
-    public static final String[] ALGEBREIC_NOTATION = initializeAlgebreicNotation();
+    public static final List<String> ALGEBREIC_NOTATION = initializeAlgebreicNotation();
     public static final Map<String, Integer> POSITION_TO_COORDINATE = initializePositionToCoordinateMap();
 
     public static final boolean[] EIGHT_RANK = initRow(0);
@@ -22,6 +26,7 @@ public class BoardUtils {
     public static final boolean[] SECOND_RANK = initRow(48);
     public static final boolean[] FIRST_RANK = initRow(56);
 
+    public static final int START_TILE_INDEX = 0;
     public static final int NUM_TILES = 64;
     public static final int NUM_TILES_PER_ROW = 8;
 
@@ -33,9 +38,8 @@ public class BoardUtils {
         return POSITION_TO_COORDINATE.get(position);
     }
 
-    public static int getPositionAtCoordinate(final int coordinate) {
-        //return ALGEBREIC_NOTATION[coordinate];
-        throw new NotImplementedException();
+    public static String getPositionAtCoordinate(final int coordinate) {
+        return ALGEBREIC_NOTATION.get(coordinate);
     }
 
     private static boolean[] initColumn(int columnNumber) {
@@ -58,11 +62,49 @@ public class BoardUtils {
         return row;
     }
 
-    private static String[] initializeAlgebreicNotation() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private static List<String> initializeAlgebreicNotation() {
+        String[] notation = new String[]{
+                "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+                "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+                "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+                "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+                "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+                "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+                "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+                "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
+        };
+
+        return Collections.unmodifiableList(Arrays.asList(notation));
     }
 
     private static Map<String, Integer> initializePositionToCoordinateMap() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final Map<String, Integer> positionToCoordinate = new HashMap<String, Integer>();
+        for (int i = START_TILE_INDEX; i < NUM_TILES; i++) {
+            positionToCoordinate.put(ALGEBREIC_NOTATION.get(i), i);
+        }
+
+        return positionToCoordinate;
+    }
+    
+    public static boolean isEndGame(final Board board) {
+        return board.currentPlayer().isInCheckmate() ||
+               board.currentPlayer().isInStalemate();
+    }
+    public static boolean threatChainScore(final Board board) {
+
+        Board currentBoard = board;
+        boolean isThreat = false;
+        while(currentBoard != null) {
+            if(currentBoard.whitePlayer().isInCheck() || currentBoard.blackPlayer().isInCheck()) {
+                isThreat = true;
+                break;
+            }
+            currentBoard = currentBoard.getTransitionMove().getBoard();
+        }
+        return isThreat;
+    }
+
+     public static boolean isThreatenedBoardImmediate(final Board board) {
+        return board.whitePlayer().isInCheck() || board.blackPlayer().isInCheck();
     }
 }

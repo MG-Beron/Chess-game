@@ -28,30 +28,38 @@ public class Board {
     private final WhitePlayer whitePlayer;
     private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
+    
+    private final Pawn enPassantMove;
+    private final Move transitionMove;
 
     public Board(final Builder builder) {
         this.gameBoard = createGameBoard(builder);
-        this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
-        this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
-
+        this.whitePieces = calculateActivePieces(builder, Alliance.WHITE);
+        this.blackPieces = calculateActivePieces(builder, Alliance.BLACK);
+        this.enPassantMove = builder.enPassantPawn;
         final Collection<Move> whiteStandardLegalMoves = calculateLegalMoves(this.whitePieces);
-        final Collection<Move> blackStandardLegalMoves = calculateLegalMoves(this.whitePieces);
+        final Collection<Move> blackStandardLegalMoves = calculateLegalMoves(this.blackPieces);
 
         this.whitePlayer = new WhitePlayer(this, whiteStandardLegalMoves, blackStandardLegalMoves);
         this.blackPlayer = new BlackPlayer(this, whiteStandardLegalMoves, blackStandardLegalMoves);
         
         this.currentPlayer = builder.nextMoveMaker.choosePlayer(this.whitePlayer, this.blackPlayer);
+        this.transitionMove = builder.transitionMove != null ? builder.transitionMove : Move.NULL_MOVE;
+    }
+    
+    public Pawn getEnPassantPawn() {
+        return enPassantMove;
     }
 
     public Tile getTile(final int tileCoordinate) {
         return gameBoard.get(tileCoordinate);
     }
 
-    public Player whitePlayer() {
+    public WhitePlayer whitePlayer() {
         return this.whitePlayer;
     }
 
-    public Player blackPlayer() {
+    public BlackPlayer blackPlayer() {
         return this.blackPlayer;
     }
     
@@ -64,9 +72,11 @@ public class Board {
         allMoves.addAll(this.whitePlayer.getLegalMoves());
         allMoves.addAll(this.blackPlayer.getLegalMoves());
         
-        return Collections.unmodifiableList(allMoves);
+        //return Collections.unmodifiableList(allMoves);
+        return allMoves;
     }
 
+  
     private List<Tile> createGameBoard(Builder builder) {
         final Tile[] tiles = new Tile[BoardUtils.NUM_TILES];
         for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
@@ -76,6 +86,10 @@ public class Board {
         return Collections.unmodifiableList(Arrays.asList(tiles));
     }
 
+    public Move getTransitionMove() {
+        return this.transitionMove;
+    }
+    
     public static Board createStandardBoard() {
         final Builder builder = new Builder();
         // Black layout
@@ -83,7 +97,7 @@ public class Board {
         builder.setPiece(new Knight(1, Alliance.BLACK));
         builder.setPiece(new Bishop(2, Alliance.BLACK));
         builder.setPiece(new Queen(3, Alliance.BLACK));
-        builder.setPiece(new King(4, Alliance.BLACK));
+        builder.setPiece(new King(4, Alliance.BLACK, true, true));
         builder.setPiece(new Bishop(5, Alliance.BLACK));
         builder.setPiece(new Knight(6, Alliance.BLACK));
         builder.setPiece(new Rook(7, Alliance.BLACK));
@@ -109,12 +123,12 @@ public class Board {
         builder.setPiece(new Knight(57, Alliance.WHITE));
         builder.setPiece(new Bishop(58, Alliance.WHITE));
         builder.setPiece(new Queen(59, Alliance.WHITE));
-        builder.setPiece(new King(60, Alliance.WHITE));
+        builder.setPiece(new King(60, Alliance.WHITE, true, true));
         builder.setPiece(new Bishop(61, Alliance.WHITE));
         builder.setPiece(new Knight(62, Alliance.WHITE));
         builder.setPiece(new Rook(63, Alliance.WHITE));
 
-        //white to move
+        //white to move first
         builder.setMoveMaker(Alliance.WHITE);
         return builder.build();
     }
@@ -126,15 +140,20 @@ public class Board {
     public Collection<Piece> getWhitePieces() {
         return this.whitePieces;
     }
-
-    private static Collection<Piece> calculateActivePieces(final List<Tile> gameBoard, final Alliance alliance) {
-        final List<Piece> activePieces = new ArrayList<Piece>();
-        for (Tile tile : gameBoard) {
-            if (tile.isTileOccupied()) {
-                final Piece piece = tile.getPiece();
-                if (piece.getPieceAlliance() == alliance) {
-                    activePieces.add(piece);
-                }
+    
+    public Iterable<Piece> getAllPieces() {
+        List<Piece> result = new ArrayList<Piece>();
+        result.addAll(this.whitePieces);
+        result.addAll(this.blackPieces);
+        return Collections.unmodifiableList(result);
+    }
+    
+    
+    private static Collection<Piece> calculateActivePieces(final Builder builder, final Alliance alliance) {
+        final List<Piece> activePieces = new ArrayList<Piece>(16);
+        for (final Piece piece : builder.boardConfig.values()) {
+            if (piece.getPieceAlliance() == alliance) {
+                activePieces.add(piece);
             }
         }
 
@@ -142,7 +161,7 @@ public class Board {
     }
 
     private Collection<Move> calculateLegalMoves(Collection<Piece> pieces) {
-        final List<Move> legalMoves = new ArrayList<Move>();
+        final List<Move> legalMoves = new ArrayList<Move>(35);
         for (final Piece piece : pieces) {
             legalMoves.addAll(piece.calculateLegalMoves(this));
         }
@@ -168,9 +187,11 @@ public class Board {
 
         Map<Integer, Piece> boardConfig;
         Alliance nextMoveMaker;
+        Move transitionMove;
+        private Pawn enPassantPawn;
 
         public Builder() {
-            this.boardConfig = new HashMap<Integer, Piece>();
+            this.boardConfig = new HashMap<Integer, Piece>(33, 1.0f);
         }
 
         public Builder setPiece(final Piece piece) {
@@ -183,12 +204,18 @@ public class Board {
             return this;
         }
 
+        public Builder setEnPassantPawn(final Pawn enPassantPawn) {
+            this.enPassantPawn = enPassantPawn;
+            return this;
+        }       
+        
+        public Builder setMoveTransition(final Move transitionMove) {
+            this.transitionMove = transitionMove;
+            return this;
+        }
+         
         public Board build() {
             return new Board(this);
-        }
-
-        void setEnPassantPawn(Pawn movedPawn) {
-            
         }
     }
 }
