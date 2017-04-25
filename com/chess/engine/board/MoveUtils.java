@@ -1,4 +1,4 @@
-package com.chess.engine.board;
+package com.chess.engine.classic.board;
 
 public enum MoveUtils {
 
@@ -13,4 +13,5 @@ public enum MoveUtils {
                 exchangeScore(move.getBoard().getTransitionMove());
 
     }
+
 }
