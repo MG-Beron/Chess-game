@@ -1,18 +1,16 @@
 package com.chess.engine.classic.board;
 
-import com.chess.engine.classic.board.Move.MoveStatus;
-
-public final class MoveTransition {
+/**
+ * The move transition class
+ */
+public class MoveTransition {
 
     private final Board fromBoard;
     private final Board toBoard;
     private final Move move;
     private final MoveStatus moveStatus;
 
-    public MoveTransition(final Board fromBoard,
-                          final Board toBoard,
-                          final Move move,
-                          final MoveStatus moveStatus) {
+    public MoveTransition(Board fromBoard, Board toBoard, Move move, MoveStatus moveStatus) {
         this.fromBoard = fromBoard;
         this.toBoard = toBoard;
         this.move = move;

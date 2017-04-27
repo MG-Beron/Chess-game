@@ -16,14 +16,18 @@ public abstract class Piece {
     protected Alliance pieceAlliance;
     protected int piecePosition;
     protected boolean isFirstMove;
-    private int cachedHashCode;
 
+    /**
+     * @param type The piece type can be PAWN, KNIGHT, BISHOP, ROOK, QUEEN and KING
+     * @param alliance The piece alliance can be WHITE or BLACK
+     * @param piecePosition The integer number that represents tha location of the piece between 0 and 63
+     * @param isFirstMove True if it is the first move for the piece
+     */
     protected Piece(PieceType type, Alliance alliance, int piecePosition, boolean isFirstMove) {
         this.pieceType = type;
         this.piecePosition = piecePosition;
         this.pieceAlliance = alliance;
         this.isFirstMove = isFirstMove;
-        this.cachedHashCode = computeHashCode();
     }
 
     public PieceType getPieceType() {
@@ -42,12 +46,21 @@ public abstract class Piece {
         return this.isFirstMove;
     }
 
+    /**
+     * Piece value is used in TakenPiecesPanel for sorting them by piece value
+     * @return The value of each piece
+     */
     public int getPieceValue() {
         return this.pieceType.getPieceValue();
     }
 
     public abstract Piece movePiece(Move move);
 
+    /**
+     * Each piece overrides the method and calculates legal moves
+     * @param board The game board
+     * @return Collection of moves
+     */
     public abstract Collection<Move> calculateLegalMoves(Board board);
 
     @Override
@@ -65,10 +78,6 @@ public abstract class Piece {
 
     @Override
     public int hashCode() {
-        return cachedHashCode;
-    }
-
-    private int computeHashCode() {
         int result = pieceType.hashCode();
         result = 31 * result + pieceAlliance.hashCode();
         result = 31 * result + piecePosition;

@@ -1,25 +1,25 @@
 package com.chess.engine.classic.board;
 
+import com.chess.engine.classic.Alliance;
+import com.chess.engine.classic.pieces.*;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.chess.engine.classic.Alliance;
-import com.chess.engine.classic.pieces.*;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableTable;
-import com.google.common.collect.Table;
-
-abstract public class Tile {
-
-    protected final int tileCoordinate;
+/**
+ * The tile class
+ * holding empty tile and occupied tile classes
+ */
+public abstract class Tile {
 
     private static final Map<Integer, EmptyTile> EMPTY_TILES = createAllPossibleEmptyTiles();
-
     private static final Table<Integer, Piece, OccupiedTile> OCCUPIED_TILES = createAllPossibleOccupiedTiles();
 
-    private Tile(final int coordinate) {
+    protected int tileCoordinate;
+
+    private Tile(int coordinate) {
         this.tileCoordinate = coordinate;
     }
 
@@ -27,16 +27,15 @@ abstract public class Tile {
 
     public abstract Piece getPiece();
 
-    public static Tile createTile(final int coordinate,
-                                  final Piece piece) {
+    public static Tile createTile(int coordinate, Piece piece) {
 
-        if(piece == null) {
+        if (piece == null) {
             return EMPTY_TILES.get(coordinate);
         }
 
-        final OccupiedTile cachedOccupiedTile = OCCUPIED_TILES.get(coordinate, piece);
+        OccupiedTile cachedOccupiedTile = OCCUPIED_TILES.get(coordinate, piece);
 
-        if(cachedOccupiedTile != null) {
+        if (cachedOccupiedTile != null) {
             return cachedOccupiedTile;
         }
 
@@ -47,71 +46,74 @@ abstract public class Tile {
         return this.tileCoordinate;
     }
 
-    private static Map<Integer,EmptyTile> createAllPossibleEmptyTiles() {
-        final Map<Integer, EmptyTile> emptyTileMap = new HashMap<Integer, EmptyTile>();
-        for(int i = 0; i < BoardUtils.NUM_TILES; i++) {
+    private static Map<Integer, EmptyTile> createAllPossibleEmptyTiles() {
+        Map<Integer, EmptyTile> emptyTileMap = new HashMap<Integer, EmptyTile>();
+        for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
             emptyTileMap.put(i, new EmptyTile(i));
         }
-        return ImmutableMap.copyOf(emptyTileMap);
+        return emptyTileMap;
     }
 
+    /**
+     * The cached occupied tiles
+     *
+     * @return a Table from the guava library
+     */
     private static Table<Integer, Piece, OccupiedTile> createAllPossibleOccupiedTiles() {
+        Table<Integer, Piece, OccupiedTile> occupiedTileTable = HashBasedTable.create();
 
-        final Table<Integer, Piece, OccupiedTile> occupiedTileTable = HashBasedTable.create();
-
-        for (final Alliance alliance : Alliance.values()) {
+        for ( Alliance alliance : Alliance.values()) {
             for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-                final Knight whiteKnightFirstMove = new Knight(alliance, i, true);
-                final Knight whiteKnightMoved = new Knight(alliance, i, false);
+                Knight whiteKnightFirstMove = new Knight(alliance, i, true);
+                Knight whiteKnightMoved = new Knight(alliance, i, false);
                 occupiedTileTable.put(i, whiteKnightFirstMove, new OccupiedTile(i, whiteKnightFirstMove));
                 occupiedTileTable.put(i, whiteKnightMoved, new OccupiedTile(i, whiteKnightMoved));
             }
 
             for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-                final Bishop whiteBishopFirstMove = new Bishop(alliance, i, true);
-                final Bishop whiteBishopMoved = new Bishop(alliance, i, false);
+                Bishop whiteBishopFirstMove = new Bishop(alliance, i, true);
+                Bishop whiteBishopMoved = new Bishop(alliance, i, false);
                 occupiedTileTable.put(i, whiteBishopFirstMove, new OccupiedTile(i, whiteBishopFirstMove));
                 occupiedTileTable.put(i, whiteBishopMoved, new OccupiedTile(i, whiteBishopMoved));
             }
 
             for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-                final Rook whiteRookFirstMove = new Rook(alliance, i, true);
-                final Rook whiteRookMoved = new Rook(alliance, i, false);
+                Rook whiteRookFirstMove = new Rook(alliance, i, true);
+                Rook whiteRookMoved = new Rook(alliance, i, false);
                 occupiedTileTable.put(i, whiteRookFirstMove, new OccupiedTile(i, whiteRookFirstMove));
                 occupiedTileTable.put(i, whiteRookMoved, new OccupiedTile(i, whiteRookMoved));
             }
 
             for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-                final Queen whiteQueenFirstMove = new Queen(alliance, i, true);
-                final Queen whiteQueenMoved = new Queen(alliance, i, false);
+                Queen whiteQueenFirstMove = new Queen(alliance, i, true);
+                Queen whiteQueenMoved = new Queen(alliance, i, false);
                 occupiedTileTable.put(i, whiteQueenFirstMove, new OccupiedTile(i, whiteQueenFirstMove));
                 occupiedTileTable.put(i, whiteQueenMoved, new OccupiedTile(i, whiteQueenMoved));
             }
 
             for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-                final Pawn whitePawnFirstMove = new Pawn(alliance, i, true);
-                final Pawn whitePawnMoved = new Pawn(alliance, i, false);
+                Pawn whitePawnFirstMove = new Pawn(alliance, i, true);
+                Pawn whitePawnMoved = new Pawn(alliance, i, false);
                 occupiedTileTable.put(i, whitePawnFirstMove, new OccupiedTile(i, whitePawnFirstMove));
                 occupiedTileTable.put(i, whitePawnMoved, new OccupiedTile(i, whitePawnMoved));
             }
 
             for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-                final King whiteKingFirstMove = new King(alliance, i, true, true);
-                final King whiteKingMoved = new King(alliance, i, false, false, false, false);
-                final King whiteKingMovedCastled = new King(alliance, i, false, true, false, false);
+                King whiteKingFirstMove = new King(alliance, i, true, true);
+                King whiteKingMoved = new King(alliance, i, false, false, false, false);
+                King whiteKingMovedCastled = new King(alliance, i, false, true, false, false);
                 occupiedTileTable.put(i, whiteKingFirstMove, new OccupiedTile(i, whiteKingFirstMove));
                 occupiedTileTable.put(i, whiteKingMoved, new OccupiedTile(i, whiteKingMoved));
                 occupiedTileTable.put(i, whiteKingMovedCastled, new OccupiedTile(i, whiteKingMovedCastled));
             }
-
         }
 
-        return ImmutableTable.copyOf(occupiedTileTable);
+        return occupiedTileTable;
     }
 
-    public static final class EmptyTile extends Tile {
+    public static class EmptyTile extends Tile {
 
-        private EmptyTile(final int coordinate) {
+        private EmptyTile(int coordinate) {
             super(coordinate);
         }
 
@@ -131,12 +133,11 @@ abstract public class Tile {
 
     }
 
-    public static final class OccupiedTile extends Tile {
+    public static class OccupiedTile extends Tile {
 
-        private final Piece pieceOnTile;
+        private Piece pieceOnTile;
 
-        private OccupiedTile(final int coordinate,
-                             final Piece pieceOnTile) {
+        private OccupiedTile(int coordinate, Piece pieceOnTile) {
             super(coordinate);
             this.pieceOnTile = pieceOnTile;
         }

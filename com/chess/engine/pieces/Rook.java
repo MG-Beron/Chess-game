@@ -7,69 +7,91 @@ import com.chess.engine.classic.board.Move;
 import com.chess.engine.classic.board.Move.MajorAttackMove;
 import com.chess.engine.classic.board.Move.MajorMove;
 import com.chess.engine.classic.board.Tile;
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class Rook extends Piece {
+/**
+ * The bishop class with two constructors and move coordinates array
+ * -8 up
+ * -1 left
+ * 1 right
+ * 8 down
+ * Calculating all legal move with calculateLegalMoves method
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Rook_(chess)">Rook piece</a>
+ */
+public class Rook extends Piece {
 
-    private final static int[] CANDIDATE_MOVE_COORDINATES = { -8, -1, 1, 8 };
+    private final static int[] CANDIDATE_MOVE_COORDINATES = {-8, -1, 1, 8};
 
-    public Rook(final Alliance alliance, final int piecePosition) {
+    public Rook(Alliance alliance, int piecePosition) {
         super(PieceType.ROOK, alliance, piecePosition, true);
     }
 
-    public Rook(final Alliance alliance,
-                final int piecePosition,
-                final boolean isFirstMove) {
+    public Rook(Alliance alliance, int piecePosition, boolean isFirstMove) {
         super(PieceType.ROOK, alliance, piecePosition, isFirstMove);
     }
 
     @Override
-    public Collection<Move> calculateLegalMoves(final Board board) {
-        final List<Move> legalMoves = new ArrayList<Move>();
-        for (final int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
+    public Collection<Move> calculateLegalMoves(Board board) {
+        List<Move> legalMoves = new ArrayList<Move>();
+        for (int currentOffset : CANDIDATE_MOVE_COORDINATES) {
             int candidateDestinationCoordinate = this.piecePosition;
             while (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
-                if (isColumnExclusion(currentCandidateOffset, candidateDestinationCoordinate)) {
+                if (isColumnExclusion(currentOffset, candidateDestinationCoordinate)) {
                     break;
                 }
-                candidateDestinationCoordinate += currentCandidateOffset;
+                candidateDestinationCoordinate += currentOffset;
                 if (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
-                    final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
+                    Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
                     if (!candidateDestinationTile.isTileOccupied()) {
-                        legalMoves.add(new MajorMove(board, this, candidateDestinationCoordinate));
+                        Move move = new MajorMove(board, this, candidateDestinationCoordinate);
+                        legalMoves.add(move);
                     } else {
-                        final Piece pieceAtDestination = candidateDestinationTile.getPiece();
-                        final Alliance pieceAtDestinationAllegiance = pieceAtDestination.getPieceAlliance();
-                        if (this.pieceAlliance != pieceAtDestinationAllegiance) {
-                            legalMoves.add(new MajorAttackMove(board, this, candidateDestinationCoordinate,
-                                    pieceAtDestination));
+                        Piece pieceAtDestination = candidateDestinationTile.getPiece();
+                        Alliance pieceAtDestinationAlliance = pieceAtDestination.getPieceAlliance();
+                        if (this.pieceAlliance != pieceAtDestinationAlliance) {
+                            Move attackMove = new MajorAttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination);
+                            legalMoves.add(attackMove);
                         }
+
+                        // stops searching for legal moves when occupied tile is reached
                         break;
                     }
                 }
             }
         }
-        return ImmutableList.copyOf(legalMoves);
+
+        return legalMoves;
     }
 
     @Override
-    public Rook movePiece(final Move move) {
+    public Rook movePiece(Move move) {
         return PieceUtils.getMovedRook(move);
     }
 
+    /**
+     * @return "R"
+     */
     @Override
     public String toString() {
         return this.pieceType.toString();
     }
 
-    private static boolean isColumnExclusion(final int currentCandidate,
-                                             final int candidateDestinationCoordinate) {
-        return (BoardUtils.FIRST_COLUMN.get(candidateDestinationCoordinate) && (currentCandidate == -1)) ||
-                (BoardUtils.EIGHTH_COLUMN.get(candidateDestinationCoordinate) && (currentCandidate == 1));
+    /**
+     * Checks if the rook moves has reached the first or the eighth column
+     * and is trying to move left -1 or right 1
+     * If so the rook should not be able to move on left or right
+     *
+     * @param currentCandidate               The current candidate offset
+     * @param candidateDestinationCoordinate The location of the candidate move
+     * @return True if the rook move is illegal and false otherwise
+     */
+    private static boolean isColumnExclusion(int currentCandidate, int candidateDestinationCoordinate) {
+        return (BoardUtils.FIRST_COLUMN[candidateDestinationCoordinate] && currentCandidate == -1) ||
+                (BoardUtils.EIGHTH_COLUMN[candidateDestinationCoordinate] && currentCandidate == 1);
     }
 
 }

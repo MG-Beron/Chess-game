@@ -7,32 +7,33 @@ import com.chess.engine.classic.board.Move;
 import com.chess.engine.classic.board.Move.MajorAttackMove;
 import com.chess.engine.classic.board.Move.MajorMove;
 import com.chess.engine.classic.board.Tile;
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class Queen extends Piece {
+/**
+ * The queen class which is mixture by bishop and rook class
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Queen_(chess)">Queen piece</a>
+ */
+public class Queen extends Piece {
 
-    private final static int[] CANDIDATE_MOVE_COORDINATES = { -9, -8, -7, -1, 1,
-            7, 8, 9 };
+    private final static int[] CANDIDATE_MOVE_COORDINATES = {-9, -8, -7, -1, 1, 7, 8, 9};
 
-    public Queen(final Alliance alliance, final int piecePosition) {
+    public Queen(Alliance alliance, int piecePosition) {
         super(PieceType.QUEEN, alliance, piecePosition, true);
     }
 
-    public Queen(final Alliance alliance,
-                 final int piecePosition,
-                 final boolean isFirstMove) {
+    public Queen(Alliance alliance, int piecePosition, boolean isFirstMove) {
         super(PieceType.QUEEN, alliance, piecePosition, isFirstMove);
     }
 
     @Override
-    public Collection<Move> calculateLegalMoves(final Board board) {
-        final List<Move> legalMoves = new ArrayList<Move>();
+    public Collection<Move> calculateLegalMoves(Board board) {
+        List<Move> legalMoves = new ArrayList<Move>();
         int candidateDestinationCoordinate;
-        for (final int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
+        for (int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
             candidateDestinationCoordinate = this.piecePosition;
             while (true) {
                 if (isFirstColumnExclusion(currentCandidateOffset, candidateDestinationCoordinate) ||
@@ -43,22 +44,24 @@ public final class Queen extends Piece {
                 if (!BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
                     break;
                 } else {
-                    final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
+                    Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
                     if (!candidateDestinationTile.isTileOccupied()) {
-                        legalMoves.add(new MajorMove(board, this, candidateDestinationCoordinate));
+                        Move move = new MajorMove(board, this, candidateDestinationCoordinate);
+                        legalMoves.add(move);
                     } else {
-                        final Piece pieceAtDestination = candidateDestinationTile.getPiece();
-                        final Alliance pieceAtDestinationAllegiance = pieceAtDestination.getPieceAlliance();
+                        Piece pieceAtDestination = candidateDestinationTile.getPiece();
+                        Alliance pieceAtDestinationAllegiance = pieceAtDestination.getPieceAlliance();
                         if (this.pieceAlliance != pieceAtDestinationAllegiance) {
-                            legalMoves.add(new MajorAttackMove(board, this, candidateDestinationCoordinate,
-                                    pieceAtDestination));
+                            Move move = new MajorAttackMove(board, this, candidateDestinationCoordinate,
+                                    pieceAtDestination);
+                            legalMoves.add(move);
                         }
                         break;
                     }
                 }
             }
         }
-        return ImmutableList.copyOf(legalMoves);
+        return legalMoves;
     }
 
     @Override
@@ -66,21 +69,44 @@ public final class Queen extends Piece {
         return PieceUtils.getMovedQueen(move);
     }
 
+    /**
+     * @return "Q"
+     */
     @Override
     public String toString() {
         return this.pieceType.toString();
     }
 
-    private static boolean isFirstColumnExclusion(final int currentPosition,
-                                                  final int candidatePosition) {
-        return BoardUtils.FIRST_COLUMN.get(candidatePosition) && ((currentPosition == -9)
-                || (currentPosition == -1) || (currentPosition == 7));
+    /**
+     * Checks the case when the queen move is located in the first column and
+     * is trying to move on left up -9, left -1 or left down 7
+     * When the queen move is in the first column of the board it should not move left
+     * In this case the -9, -1, and 7 move numbers are illegal
+     * FIRST_COLUMN is a boolean array that returns true for the first column coordinates
+     *
+     * @param candidateOffset the candidate offset of the queen
+     * @param currentPosition the location of the queen move
+     * @return true if the queen move is illegal and false otherwise
+     */
+    private static boolean isFirstColumnExclusion(int candidateOffset, int currentPosition) {
+        return BoardUtils.FIRST_COLUMN[currentPosition] &&
+                (candidateOffset == -9 || candidateOffset == -1 || candidateOffset == 7);
     }
 
-    private static boolean isEightColumnExclusion(final int currentPosition,
-                                                  final int candidatePosition) {
-        return BoardUtils.EIGHTH_COLUMN.get(candidatePosition) && ((currentPosition == -7)
-                || (currentPosition == 1) || (currentPosition == 9));
+    /**
+     * Checks the case when the queen move is located in the eighth column and
+     * is trying to move on right up -7, right 1 or right down 9
+     * When the queen move is in the eighth column of the board it should not move right
+     * In this case the -7, 1, and 9 move numbers are illegal
+     * EIGHTH_COLUMN is a boolean array that returns true for the eighth column coordinates
+     *
+     * @param candidateOffset the candidate offset of the queen
+     * @param currentPosition the location of the queen move
+     * @return true if the queen move is illegal and false otherwise
+     */
+    private static boolean isEightColumnExclusion(int candidateOffset, int currentPosition) {
+        return BoardUtils.EIGHTH_COLUMN[currentPosition] &&
+                (candidateOffset == -7 || candidateOffset == 1 || candidateOffset == 9);
     }
 
 }

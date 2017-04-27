@@ -1,14 +1,14 @@
 package com.chess;
 
-import com.chess.engine.classic.board.Board;
 import com.chess.gui.Table;
 
+/**
+ * The starting point of the program
+ * creating the table class - the GUI
+ */
 public class Main {
 
     public static void main(String[] args) {
-        Board board = Board.createStandardBoard();
-        System.out.println(board);
-        
-        Table table = new Table();
+         Table chessTable = new Table();
     }
 }

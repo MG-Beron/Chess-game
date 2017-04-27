@@ -7,77 +7,109 @@ import com.chess.engine.classic.board.Move;
 import com.chess.engine.classic.board.Move.MajorAttackMove;
 import com.chess.engine.classic.board.Move.MajorMove;
 import com.chess.engine.classic.board.Tile;
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class Bishop extends Piece {
+/**
+ * The bishop class with two constructors and move coordinates array
+ * -9 up left
+ * -7 up right
+ * 7 down left
+ * 9 down right
+ * Calculating all legal move with calculateLegalMoves method
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Bishop_(chess)">Bishop piece</a>
+ */
+public class Bishop extends Piece {
 
     private final static int[] CANDIDATE_MOVE_COORDINATES = {-9, -7, 7, 9};
 
-    public Bishop(final Alliance alliance,
-                  final int piecePosition) {
+    public Bishop(Alliance alliance, int piecePosition) {
         super(PieceType.BISHOP, alliance, piecePosition, true);
     }
 
-    public Bishop(final Alliance alliance,
-                  final int piecePosition,
-                  final boolean isFirstMove) {
+    public Bishop(Alliance alliance, int piecePosition, boolean isFirstMove) {
         super(PieceType.BISHOP, alliance, piecePosition, isFirstMove);
     }
 
     @Override
-    public Collection<Move> calculateLegalMoves(final Board board) {
-        final List<Move> legalMoves = new ArrayList<Move>();
-        for (final int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
-            int candidateDestinationCoordinate = this.piecePosition;
-            while (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
-                if (isFirstColumnExclusion(currentCandidateOffset, candidateDestinationCoordinate) ||
-                        isEighthColumnExclusion(currentCandidateOffset, candidateDestinationCoordinate)) {
+    public Collection<Move> calculateLegalMoves(Board board) {
+        List<Move> legalMoves = new ArrayList<Move>();
+        for (int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
+            int destinationCoordinate = this.piecePosition;
+            while (BoardUtils.isValidTileCoordinate(destinationCoordinate)) {
+                if (isFirstColumnExclusion(currentCandidateOffset, destinationCoordinate) ||
+                        isEighthColumnExclusion(currentCandidateOffset, destinationCoordinate)) {
                     break;
                 }
-                candidateDestinationCoordinate += currentCandidateOffset;
-                if (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
-                    final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
-                    if (!candidateDestinationTile.isTileOccupied()) {
-                        legalMoves.add(new MajorMove(board, this, candidateDestinationCoordinate));
-                    }
-                    else {
-                        final Piece pieceAtDestination = candidateDestinationTile.getPiece();
-                        final Alliance pieceAlliance = pieceAtDestination.getPieceAlliance();
+                destinationCoordinate += currentCandidateOffset;
+                if (BoardUtils.isValidTileCoordinate(destinationCoordinate)) {
+                    Tile destinationTile = board.getTile(destinationCoordinate);
+                    if (!destinationTile.isTileOccupied()) {
+                        Move move = new MajorMove(board, this, destinationCoordinate);
+                        legalMoves.add(move);
+                    } else if (destinationTile.isTileOccupied()) {
+                        Piece pieceAtDestination = destinationTile.getPiece();
+                        Alliance pieceAlliance = pieceAtDestination.getPieceAlliance();
                         if (this.pieceAlliance != pieceAlliance) {
-                            legalMoves.add(new MajorAttackMove(board, this, candidateDestinationCoordinate,
-                                    pieceAtDestination));
+                            Move attackMove = new MajorAttackMove(board, this, destinationCoordinate,
+                                    pieceAtDestination);
+                            legalMoves.add(attackMove);
                         }
+                        // stops searching for legal moves when occupied tile is reached
                         break;
                     }
                 }
             }
         }
-        return ImmutableList.copyOf(legalMoves);
+
+        return legalMoves;
     }
 
     @Override
-    public Bishop movePiece(final Move move) {
+    public Bishop movePiece(Move move) {
         return PieceUtils.getMovedBishop(move);
     }
 
+    /**
+     * @return "B"
+     */
     @Override
     public String toString() {
         return this.pieceType.toString();
     }
 
-    private static boolean isFirstColumnExclusion(final int currentCandidate,
-                                                  final int candidateDestinationCoordinate) {
-        return (BoardUtils.FIRST_COLUMN.get(candidateDestinationCoordinate) &&
-                ((currentCandidate == -9) || (currentCandidate == 7)));
+    /**
+     * Checks the case when the bishop move is located in the first column and
+     * is trying to move on left up -9 or left down 7
+     * When the bishop move is in the first column of the board it should not move left
+     * In this case the -9 and 7 move numbers are illegal
+     * FIRST_COLUMN is a boolean array that returns true for the first column coordinates
+     *
+     * @param currentCandidate      the current candidate offset of the bishop
+     * @param destinationCoordinate the location of the bishop move
+     * @return true if the bishop move is illegal and false otherwise
+     */
+    private boolean isFirstColumnExclusion(int currentCandidate, int destinationCoordinate) {
+        return (BoardUtils.FIRST_COLUMN[destinationCoordinate] &&
+                (currentCandidate == -9 || currentCandidate == 7));
     }
 
-    private static boolean isEighthColumnExclusion(final int currentCandidate,
-                                                   final int candidateDestinationCoordinate) {
-        return BoardUtils.EIGHTH_COLUMN.get(candidateDestinationCoordinate) &&
-                ((currentCandidate == -7) || (currentCandidate == 9));
+    /**
+     * Checks the case when the bishop move is located in the eighth column and
+     * is trying to move on right up -7 or right down 9.
+     * When the bishop move is in the edge of the board it should not move right
+     * In this case the -7 and 9 move numbers are illegal
+     * EIGHTH_COLUMN is a boolean array that returns true for the eighth column coordinates
+     *
+     * @param currentCandidate      the current candidate offset of the bishop
+     * @param destinationCoordinate the location of the bishop move
+     * @return true if the bishop move is illegal and false otherwise
+     */
+    private boolean isEighthColumnExclusion(int currentCandidate, int destinationCoordinate) {
+        return BoardUtils.EIGHTH_COLUMN[destinationCoordinate] &&
+                (currentCandidate == -7 || currentCandidate == 9);
     }
 }

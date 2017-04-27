@@ -17,37 +17,47 @@ import com.google.common.collect.Iterables;
 
 import java.util.*;
 
-public final class Board {
+/**
+ * The board class using the Builder pattern
+ */
+public class Board {
 
-    private final List<Tile> gameBoard;
-    private final Collection<Piece> whitePieces;
-    private final Collection<Piece> blackPieces;
-    private final WhitePlayer whitePlayer;
-    private final BlackPlayer blackPlayer;
-    private final Player currentPlayer;
+    private List<Tile> gameBoard;
+    private Collection<Piece> whitePieces;
+    private Collection<Piece> blackPieces;
+    private WhitePlayer whitePlayer;
+    private BlackPlayer blackPlayer;
+    private Player currentPlayer;
     
-    private final Pawn enPassantPawn;
-    private final Move transitionMove;
+    private Pawn enPassantPawn;
+    private Move transitionMove;
 
-    public Board(final Builder builder) {
+    /**
+     * @param builder The builder
+     */
+    public Board(Builder builder) {
         this.gameBoard = createGameBoard(builder);
         this.whitePieces = calculateActivePieces(builder, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(builder, Alliance.BLACK);
         this.enPassantPawn = builder.enPassantPawn;
-        final Collection<Move> whiteStandardMoves = calculateLegalMoves(this.whitePieces);
-        final Collection<Move> blackStandardMoves = calculateLegalMoves(this.blackPieces);
+        Collection<Move> whiteStandardMoves = calculateLegalMoves(this.whitePieces);
+        Collection<Move> blackStandardMoves = calculateLegalMoves(this.blackPieces);
         this.whitePlayer = new WhitePlayer(this, whiteStandardMoves, blackStandardMoves);
         this.blackPlayer = new BlackPlayer(this, whiteStandardMoves, blackStandardMoves);
         this.currentPlayer = builder.nextMoveMaker.choosePlayerByAlliance(this.whitePlayer, this.blackPlayer);
         this.transitionMove = builder.transitionMove != null ? builder.transitionMove : Move.NULL_MOVE;
     }
 
+    /**
+     * @return The board table tiles
+     */
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-            final String tileText = prettyPrint(this.gameBoard.get(i));
+            String tileText = prettyPrint(this.gameBoard.get(i));
             builder.append(String.format("%3s", tileText));
+            // Append a new line if the eighth column is reached
             if ((i + 1) % 8 == 0) {
                 builder.append("\n");
             }
@@ -55,11 +65,24 @@ public final class Board {
         return builder.toString();
     }
 
-    private static String prettyPrint(final Tile tile) {
+    /**
+     * If the piece is black -> lower case print
+     * If the piece is white -> upper case print
+     * The - symbol for empty tile
+     * @param tile The tile
+     * @return A tile symbol
+     */
+    private static String prettyPrint(Tile tile) {
         if(tile.isTileOccupied()) {
-            return tile.getPiece().getPieceAlliance().isBlack() ?
-                    tile.toString().toLowerCase() : tile.toString();
+            if (tile.getPiece().getPieceAlliance().isBlack()) {
+                return tile.toString().toLowerCase();
+            }
+
+            if (tile.getPiece().getPieceAlliance().isWhite()) {
+                return tile.toString();
+            }
         }
+        // "-"
         return tile.toString();
     }
 
@@ -104,8 +127,13 @@ public final class Board {
         return this.transitionMove;
     }
 
+    /**
+     * Creating the standard start chess board
+     * White to move first
+     * @return Board
+     */
     public static Board createStandardBoard() {
-        final Builder builder = new Builder();
+        Builder builder = new Builder();
         // Black Layout
         builder.setPiece(new Rook(Alliance.BLACK, 0));
         builder.setPiece(new Knight(Alliance.BLACK, 1));
@@ -146,7 +174,12 @@ public final class Board {
         return builder.build();
     }
 
-    private static List<Tile> createGameBoard(final Builder boardBuilder) {
+    /**
+     * Iterates from 0 to 63 and is creating the game board
+     * @param boardBuilder The builder
+     * @return A list of tiles
+     */
+    private static List<Tile> createGameBoard(Builder boardBuilder) {
         final Tile[] tiles = new Tile[BoardUtils.NUM_TILES];
         for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
             tiles[i] = Tile.createTile(i, boardBuilder.boardConfig.get(i));
@@ -154,25 +187,41 @@ public final class Board {
         return ImmutableList.copyOf(tiles);
     }
 
+    /**
+     * Iterates over pieces and gets the all legal moves
+     * @param pieces All pieces
+     * @return The legal moves
+     */
     private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
         final List<Move> legalMoves = new ArrayList<Move>(35);
-        for (final Piece piece : pieces) {
+        for (Piece piece : pieces) {
             legalMoves.addAll(piece.calculateLegalMoves(this));
         }
-        return ImmutableList.copyOf(legalMoves);
+        return legalMoves;
     }
 
-    private static Collection<Piece> calculateActivePieces(final Builder builder,
-                                                           final Alliance alliance) {
+    /**
+     * Iterates over the boardConfig pieces
+     * @param builder The builder
+     * @param alliance The alliance
+     * @return Active pieces
+     */
+    private static Collection<Piece> calculateActivePieces(Builder builder, Alliance alliance) {
         final List<Piece> activePieces = new ArrayList<Piece>(16);
-        for (final Piece piece : builder.boardConfig.values()) {
+        for (Piece piece : builder.boardConfig.values()) {
             if (piece.getPieceAlliance() == alliance) {
                 activePieces.add(piece);
             }
         }
-        return ImmutableList.copyOf(activePieces);
+        return activePieces;
     }
 
+    /**
+     * The builder class
+     * board config is a map
+     * key -> the piece position
+     * value -> the piece
+     */
     public static class Builder {
 
         Map<Integer, Piece> boardConfig;

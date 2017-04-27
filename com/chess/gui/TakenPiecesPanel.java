@@ -17,39 +17,39 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * The taken pieces JPanel
+ */
 class TakenPiecesPanel extends JPanel {
 
-    private final JPanel northPanel;
-    private final JPanel southPanel;
-
-    private static final long serialVersionUID = 1L;
     private static final Color PANEL_COLOR = Color.decode("0xFDF5E6");
-    private static final Dimension TAKEN_PIECES_PANEL_DIMENSION = new Dimension(40, 80);
-    private static final EtchedBorder PANEL_BORDER = new EtchedBorder(EtchedBorder.RAISED);
+
+    private JPanel northPanel;
+    private JPanel southPanel;
 
     public TakenPiecesPanel() {
         super(new BorderLayout());
         setBackground(Color.decode("0xFDF5E6"));
-        setBorder(PANEL_BORDER);
+        setBorder(new EtchedBorder(EtchedBorder.RAISED));
         this.northPanel = new JPanel(new GridLayout(8, 2));
         this.southPanel = new JPanel(new GridLayout(8, 2));
         this.northPanel.setBackground(PANEL_COLOR);
         this.southPanel.setBackground(PANEL_COLOR);
         add(this.northPanel, BorderLayout.NORTH);
         add(this.southPanel, BorderLayout.SOUTH);
-        setPreferredSize(TAKEN_PIECES_PANEL_DIMENSION);
+        setPreferredSize(new Dimension(40, 80));
     }
 
-    public void redo(final MoveLog moveLog) {
+    public void redo(MoveLog moveLog) {
         southPanel.removeAll();
         northPanel.removeAll();
 
-        final List<Piece> whiteTakenPieces = new ArrayList<Piece>();
-        final List<Piece> blackTakenPieces = new ArrayList<Piece>();
+        List<Piece> whiteTakenPieces = new ArrayList<Piece>();
+        List<Piece> blackTakenPieces = new ArrayList<Piece>();
 
-        for(final Move move : moveLog.getMoves()) {
+        for(Move move : moveLog.getMoves()) {
             if(move.isAttack()) {
-                final Piece takenPiece = move.getAttackedPiece();
+                Piece takenPiece = move.getAttackedPiece();
                 if(takenPiece.getPieceAlliance().isWhite()) {
                     whiteTakenPieces.add(takenPiece);
                 } else if(takenPiece.getPieceAlliance().isBlack()){
@@ -76,11 +76,11 @@ class TakenPiecesPanel extends JPanel {
 
         for (final Piece takenPiece : whiteTakenPieces) {
             try {
-                final BufferedImage image = ImageIO.read(new File("src/pieces/fancy/"
+                BufferedImage image = ImageIO.read(new File("src/pieces/fancy/"
                         + takenPiece.getPieceAlliance().toString().substring(0, 1) + "" + takenPiece.toString()
                         + ".gif"));
-                final ImageIcon ic = new ImageIcon(image);
-                final JLabel imageLabel = new JLabel(new ImageIcon(ic.getImage().getScaledInstance(
+                ImageIcon ic = new ImageIcon(image);
+                JLabel imageLabel = new JLabel(new ImageIcon(ic.getImage().getScaledInstance(
                         ic.getIconWidth() - 15, ic.getIconWidth() - 15, Image.SCALE_SMOOTH)));
                 this.southPanel.add(imageLabel);
             }
@@ -96,9 +96,9 @@ class TakenPiecesPanel extends JPanel {
                         + ".gif";
 
                // System.out.println(pathName);
-                final BufferedImage image = ImageIO.read(new File(pathName));
-                final ImageIcon ic = new ImageIcon(image);
-                final JLabel imageLabel = new JLabel(new ImageIcon(ic.getImage().getScaledInstance(
+                BufferedImage image = ImageIO.read(new File(pathName));
+                ImageIcon ic = new ImageIcon(image);
+                JLabel imageLabel = new JLabel(new ImageIcon(ic.getImage().getScaledInstance(
                         ic.getIconWidth() - 15, ic.getIconWidth() - 15, Image.SCALE_SMOOTH)));
                 this.northPanel.add(imageLabel);
 

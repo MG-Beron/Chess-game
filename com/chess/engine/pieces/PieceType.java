@@ -1,7 +1,7 @@
 package com.chess.engine.classic.pieces;
 
 /*
-Piece types cant be
+Piece types can be
 PAWN with value 100 and name P
 KNIGHT with value 320 and name N
 BISHOP with value 330 and name B
@@ -81,8 +81,8 @@ public enum PieceType {
         }
     };
 
-    private final int value;
-    private final String pieceName;
+    private int value;
+    private String pieceName;
 
     public int getPieceValue() {
         return this.value;
@@ -94,6 +94,7 @@ public enum PieceType {
     }
 
     public abstract boolean isRook();
+
     public abstract boolean isKing();
 
     @Override

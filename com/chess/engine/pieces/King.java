@@ -7,35 +7,40 @@ import com.chess.engine.classic.board.Move;
 import com.chess.engine.classic.board.Move.MajorAttackMove;
 import com.chess.engine.classic.board.Move.MajorMove;
 import com.chess.engine.classic.board.Tile;
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class King extends Piece {
+/**
+ * The king class with two constructors and move coordinates array
+ * -9 up left
+ * -8 up
+ * -7 up right
+ * -1 left
+ * 1 right
+ * 7 down left
+ * 8 down
+ * 9 down right
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/King_(chess)">King piece</a>
+ */
+public class King extends Piece {
 
-    private final static int[] CANDIDATE_MOVE_COORDINATES = { -9, -8, -7, -1, 1, 7, 8, 9 };
-    private final boolean isCastled;
-    private final boolean kingSideCastleCapable;
-    private final boolean queenSideCastleCapable;
+    private final static int[] CANDIDATE_MOVE_COORDINATES = {-9, -8, -7, -1, 1, 7, 8, 9};
+    private boolean isCastled;
+    private boolean kingSideCastleCapable;
+    private boolean queenSideCastleCapable;
 
-    public King(final Alliance alliance,
-                final int piecePosition,
-                final boolean kingSideCastleCapable,
-                final boolean queenSideCastleCapable) {
+    public King(Alliance alliance, int piecePosition, boolean kingSideCastleCapable, boolean queenSideCastleCapable) {
         super(PieceType.KING, alliance, piecePosition, true);
         this.isCastled = false;
         this.kingSideCastleCapable = kingSideCastleCapable;
         this.queenSideCastleCapable = queenSideCastleCapable;
     }
 
-    public King(final Alliance alliance,
-                final int piecePosition,
-                final boolean isFirstMove,
-                final boolean isCastled,
-                final boolean kingSideCastleCapable,
-                final boolean queenSideCastleCapable) {
+    public King(Alliance alliance, int piecePosition, boolean isFirstMove, boolean isCastled,
+                boolean kingSideCastleCapable, boolean queenSideCastleCapable) {
         super(PieceType.KING, alliance, piecePosition, isFirstMove);
         this.isCastled = isCastled;
         this.kingSideCastleCapable = kingSideCastleCapable;
@@ -55,44 +60,49 @@ public final class King extends Piece {
     }
 
     @Override
-    public Collection<Move> calculateLegalMoves(final Board board) {
-        final List<Move> legalMoves = new ArrayList<Move>();
-        for (final int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
+    public Collection<Move> calculateLegalMoves(Board board) {
+        List<Move> legalMoves = new ArrayList<Move>();
+        for (int currentCandidateOffset : CANDIDATE_MOVE_COORDINATES) {
             if (isFirstColumnExclusion(this.piecePosition, currentCandidateOffset) ||
                     isEighthColumnExclusion(this.piecePosition, currentCandidateOffset)) {
                 continue;
             }
-            final int candidateDestinationCoordinate = this.piecePosition + currentCandidateOffset;
-            if (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
-                final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
+            int destinationCoordinate = this.piecePosition + currentCandidateOffset;
+            if (BoardUtils.isValidTileCoordinate(destinationCoordinate)) {
+                Tile candidateDestinationTile = board.getTile(destinationCoordinate);
                 if (!candidateDestinationTile.isTileOccupied()) {
-                    legalMoves.add(new MajorMove(board, this, candidateDestinationCoordinate));
-                }
-                else {
-                    final Piece pieceAtDestination = candidateDestinationTile.getPiece();
-                    final Alliance pieceAtDestinationAllegiance = pieceAtDestination.getPieceAlliance();
-                    if (this.pieceAlliance != pieceAtDestinationAllegiance) {
-                        legalMoves.add(new MajorAttackMove(board, this, candidateDestinationCoordinate,
-                                pieceAtDestination));
+                    Move move = new MajorMove(board, this, destinationCoordinate);
+                    legalMoves.add(move);
+                } else if (candidateDestinationTile.isTileOccupied()) {
+                    Piece pieceAtDestination = candidateDestinationTile.getPiece();
+                    Alliance pieceAtDestinationAlliance = pieceAtDestination.getPieceAlliance();
+                    if (this.pieceAlliance != pieceAtDestinationAlliance) {
+                        Move attackMove = new MajorAttackMove(board, this, destinationCoordinate, pieceAtDestination);
+                        legalMoves.add(attackMove);
                     }
                 }
             }
         }
-        return ImmutableList.copyOf(legalMoves);
+
+        return legalMoves;
     }
 
+    /**
+     * @return "K"
+     */
     @Override
     public String toString() {
         return this.pieceType.toString();
     }
 
     @Override
-    public King movePiece(final Move move) {
-        return new King(this.pieceAlliance, move.getDestinationCoordinate(), false, move.isCastlingMove(), false, false);
+    public King movePiece(Move move) {
+        return new King(this.pieceAlliance, move.getDestinationCoordinate(), false, move.isCastlingMove(), false,
+                false);
     }
 
     @Override
-    public boolean equals(final Object other) {
+    public boolean equals(Object other) {
         if (this == other) {
             return true;
         }
@@ -111,17 +121,35 @@ public final class King extends Piece {
         return (31 * super.hashCode()) + (isCastled ? 1 : 0);
     }
 
-    private static boolean isFirstColumnExclusion(final int currentCandidate,
-                                                  final int candidateDestinationCoordinate) {
-        return BoardUtils.FIRST_COLUMN.get(currentCandidate)
-                && ((candidateDestinationCoordinate == -9) || (candidateDestinationCoordinate == -1) ||
-                (candidateDestinationCoordinate == 7));
+    /**
+     * Checks the case when the king is located in the first column and
+     * is trying to move on left up -9 or left -1 or left down 7
+     * When the king is in the first column of the board it should not move left
+     * In this case the -9, -1 and 7 move numbers are illegal
+     * FIRST_COLUMN is a boolean array that returns true for the first column coordinates
+     *
+     * @param currentPosition  the current location of the king
+     * @param destinationOffset the destination offset of the king
+     * @return true if the king move is illegal and false otherwise
+     */
+    private static boolean isFirstColumnExclusion(int currentPosition, int destinationOffset) {
+        return BoardUtils.FIRST_COLUMN[currentPosition] &&
+                (destinationOffset == -9 || destinationOffset == -1 || destinationOffset == 7);
     }
 
-    private static boolean isEighthColumnExclusion(final int currentCandidate,
-                                                   final int candidateDestinationCoordinate) {
-        return BoardUtils.EIGHTH_COLUMN.get(currentCandidate)
-                && ((candidateDestinationCoordinate == -7) || (candidateDestinationCoordinate == 1) ||
-                (candidateDestinationCoordinate == 9));
+    /**
+     * Checks the case when the king is located in the eighth column and
+     * is trying to move on right up -7 or right 1 or right down 9.
+     * When the king is in the edge of the board it should not move right
+     * In this case the -7, 1, 9 move numbers are illegal
+     * EIGHTH_COLUMN is a boolean array that returns true for the eighth column coordinates
+     *
+     * @param currentPosition   the current location of the king
+     * @param destinationOffset the destination offset of the king
+     * @return true if the king move is illegal and false otherwise
+     */
+    private boolean isEighthColumnExclusion(int currentPosition, int destinationOffset) {
+        return BoardUtils.EIGHTH_COLUMN[currentPosition] &&
+                (destinationOffset == -7 || destinationOffset == 1 || destinationOffset == 9);
     }
 }
