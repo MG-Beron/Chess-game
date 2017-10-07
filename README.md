@@ -7,4 +7,4 @@ Extract the files and run Java-Chess.jar
 
 ## How to play ?
 The game is for two players :)
-![how to play](https://github.com/MG-Beron/Chess-game/game-example.png)
+![how to play](https://github.com/MG-Beron/Chess-game/blob/master/game-example.png)
