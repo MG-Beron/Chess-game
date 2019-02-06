@@ -1,4 +1,4 @@
-package com.chess.engine.classic.pieces;
+package com.chess.engine.pieces;
 
 /*
 Piece types can be

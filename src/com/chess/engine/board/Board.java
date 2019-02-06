@@ -1,17 +1,16 @@
-package com.chess.engine.classic.board;
+package com.chess.engine.board;
 
-
-import com.chess.engine.classic.Alliance;
-import com.chess.engine.classic.pieces.Bishop;
-import com.chess.engine.classic.pieces.King;
-import com.chess.engine.classic.pieces.Knight;
-import com.chess.engine.classic.pieces.Pawn;
-import com.chess.engine.classic.pieces.Piece;
-import com.chess.engine.classic.pieces.Queen;
-import com.chess.engine.classic.pieces.Rook;
-import com.chess.engine.classic.player.BlackPlayer;
-import com.chess.engine.classic.player.Player;
-import com.chess.engine.classic.player.WhitePlayer;
+import com.chess.engine.Alliance;
+import com.chess.engine.pieces.Bishop;
+import com.chess.engine.pieces.King;
+import com.chess.engine.pieces.Knight;
+import com.chess.engine.pieces.Pawn;
+import com.chess.engine.pieces.Piece;
+import com.chess.engine.pieces.Queen;
+import com.chess.engine.pieces.Rook;
+import com.chess.engine.player.BlackPlayer;
+import com.chess.engine.player.Player;
+import com.chess.engine.player.WhitePlayer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 

@@ -1,4 +1,4 @@
-package com.chess.engine.classic.board;
+package com.chess.engine.board;
 
 /**
  * The move transition class

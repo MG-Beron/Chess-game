@@ -1,7 +1,7 @@
 package com.chess.gui;
 
-import com.chess.engine.classic.board.Board;
-import com.chess.engine.classic.board.Move;
+import com.chess.engine.board.Board;
+import com.chess.engine.board.Move;
 import com.chess.gui.Table.MoveLog;
 
 import javax.swing.*;

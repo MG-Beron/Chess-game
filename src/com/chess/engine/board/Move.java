@@ -1,10 +1,10 @@
-package com.chess.engine.classic.board;
+package com.chess.engine.board;
 
-import com.chess.engine.classic.board.Board.Builder;
-import com.chess.engine.classic.pieces.Pawn;
-import com.chess.engine.classic.pieces.Piece;
-import com.chess.engine.classic.pieces.PieceType;
-import com.chess.engine.classic.pieces.Rook;
+import com.chess.engine.board.Board.Builder;
+import com.chess.engine.pieces.Pawn;
+import com.chess.engine.pieces.Piece;
+import com.chess.engine.pieces.PieceType;
+import com.chess.engine.pieces.Rook;
 
 /**
  * The move class holds static move classes and move factory

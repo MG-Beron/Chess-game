@@ -1,4 +1,4 @@
-package com.chess.engine.classic.board;
+package com.chess.engine.board;
 
 import com.chess.gui.Table.TilePanel;
 import com.google.common.collect.Lists;

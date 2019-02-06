@@ -1,7 +1,7 @@
-package com.chess.engine.classic.board;
+package com.chess.engine.board;
 
-import com.chess.engine.classic.Alliance;
-import com.chess.engine.classic.pieces.*;
+import com.chess.engine.Alliance;
+import com.chess.engine.pieces.*;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 

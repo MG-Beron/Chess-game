@@ -1,13 +1,13 @@
-package com.chess.engine.classic.player;
+package com.chess.engine.player;
 
-import com.chess.engine.classic.Alliance;
-import com.chess.engine.classic.board.Board;
-import com.chess.engine.classic.board.Move;
-import com.chess.engine.classic.board.Move.KingSideCastleMove;
-import com.chess.engine.classic.board.Move.QueenSideCastleMove;
-import com.chess.engine.classic.board.Tile;
-import com.chess.engine.classic.pieces.Piece;
-import com.chess.engine.classic.pieces.Rook;
+import com.chess.engine.Alliance;
+import com.chess.engine.board.Board;
+import com.chess.engine.board.Move;
+import com.chess.engine.board.Move.KingSideCastleMove;
+import com.chess.engine.board.Move.QueenSideCastleMove;
+import com.chess.engine.board.Tile;
+import com.chess.engine.pieces.Piece;
+import com.chess.engine.pieces.Rook;
 
 import java.util.ArrayList;
 import java.util.Collection;

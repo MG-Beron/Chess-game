@@ -1,7 +1,7 @@
 package com.chess.gui;
 
-import com.chess.engine.classic.board.Move;
-import com.chess.engine.classic.pieces.Piece;
+import com.chess.engine.board.Move;
+import com.chess.engine.pieces.Piece;
 import com.chess.gui.Table.MoveLog;
 import com.google.common.primitives.Ints;
 

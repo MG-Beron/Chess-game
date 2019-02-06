@@ -1,8 +1,8 @@
-package com.chess.engine.classic.pieces;
+package com.chess.engine.pieces;
 
-import com.chess.engine.classic.Alliance;
-import com.chess.engine.classic.board.BoardUtils;
-import com.chess.engine.classic.board.Move;
+import com.chess.engine.Alliance;
+import com.chess.engine.board.BoardUtils;
+import com.chess.engine.board.Move;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 

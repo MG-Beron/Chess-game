@@ -1,4 +1,4 @@
-package com.chess.engine.classic.board;
+package com.chess.engine.board;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,8 +1,8 @@
 package com.chess.gui;
 
-import com.chess.engine.classic.board.*;
-import com.chess.engine.classic.board.Move.MoveFactory;
-import com.chess.engine.classic.pieces.Piece;
+import com.chess.engine.board.*;
+import com.chess.engine.board.Move.MoveFactory;
+import com.chess.engine.pieces.Piece;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

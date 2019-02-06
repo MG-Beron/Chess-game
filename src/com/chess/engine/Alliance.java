@@ -1,9 +1,9 @@
-package com.chess.engine.classic;
+package com.chess.engine;
 
-import com.chess.engine.classic.board.BoardUtils;
-import com.chess.engine.classic.player.BlackPlayer;
-import com.chess.engine.classic.player.Player;
-import com.chess.engine.classic.player.WhitePlayer;
+import com.chess.engine.board.BoardUtils;
+import com.chess.engine.player.BlackPlayer;
+import com.chess.engine.player.Player;
+import com.chess.engine.player.WhitePlayer;
 
 /**
  * The alliance enum
